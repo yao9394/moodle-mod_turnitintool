@@ -577,6 +577,32 @@ function xmldb_turnitintool_upgrade($oldversion) {
         }
     }
 
+    if ($result && $oldversion < 2020082600) {
+        $dbman=$DB->get_manager();
+        $table = new xmldb_table('turnitintool');
+        $field = new xmldb_field('transmatch', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'erater_style');
+        $dbman->change_field_notnull($table, $field);
+
+        $field = new xmldb_field('needs_updating', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, 0, 'transmatch');
+        // Launch change of precision for field value.
+        $dbman->change_field_precision($table, $field);
+        $dbman->change_field_notnull($table, $field);
+
+        $field = new xmldb_field('institution_check', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, null, null, 0, 'needs_updating');
+        $dbman->change_field_notnull($table, $field);
+
+        $field = new xmldb_field('migrated', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, null, null, 0, 'institution_check');
+        $dbman->change_field_notnull($table, $field);
+
+        $table = new xmldb_table('turnitintool_users');
+        $field = new xmldb_field('turnitin_utp', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'turnitin_uid');
+        $dbman->change_field_notnull($table, $field);
+
+        $table = new xmldb_table('turnitintool_submissions');
+        $field = new xmldb_field('submission_transmatch', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0, 'submission_unanonreason');
+        $dbman->change_field_notnull($table, $field);
+    }
+
     return $result;
 }
 
